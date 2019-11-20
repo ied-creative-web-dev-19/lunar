@@ -123,19 +123,45 @@ Jumper.Play.prototype = {
   },
 
   moveHeroByClick: function() {
-
-    console.log('click');
-
     if( !this.hero.body.touching.down ) {
       return;
     }
-    this.hero.body.velocity.y = -350;
-    if ( this.game.input.activePointer.x > this.game.width/2 ){
-      this.hero.body.velocity.x = 50;
-    } else {
-      this.hero.body.velocity.x = -50;
-    }
 
+    let jumpVelocities = this.getJumpVelocitiesForNextPlatform();
+    console.log(jumpVelocities);
+    this.hero.body.velocity.y = jumpVelocities[1];
+    if ( this.game.input.activePointer.x > this.game.width/2 ){
+      this.hero.body.velocity.x = jumpVelocities[0];
+    } else {
+      this.hero.body.velocity.x = -jumpVelocities[0];
+    }
+  },
+
+  getJumpVelocitiesForNextPlatform: function() {
+    const jumpVelocities = [10, 10];
+
+    const heroX = this.hero.position.x;
+    const heroY = this.hero.position.y;
+    let platformXMin = 0;
+    let platformYMin = 0;
+    this.platforms.forEachAlive((platform) => {
+      if ( platform.position.y < platformYMin ) {
+        platformYMin = platform.position.y;
+        platformXMin =  platform.position.x;
+      }
+    });
+
+    console.log(platformXMin, platformYMin);
+    console.log(heroX, heroY);
+
+    // calculate parabole velocities
+    let xVelocity = Math.abs( ( heroX - platformXMin ) * 0.6 );
+    let yVelocity = -450;
+
+    jumpVelocities[0] = xVelocity;
+    jumpVelocities[1] = yVelocity;
+
+    return jumpVelocities;
   },
 
   heroMove: function() {
