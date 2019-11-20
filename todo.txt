@@ -1,6 +1,5 @@
 TODO
 
-- ripristinare finestre dinamiche per mobile
 - [HIGH]Correggere e migliorare il salto del personaggio nel gioco
 - [NICE TO HAVE] Creare sistema che ogni X (random) piattaforme faccia in modo che una di esse si sgretoli dopo un tot di secondi che il personaggi vi risiede
 - Inserire la grafica

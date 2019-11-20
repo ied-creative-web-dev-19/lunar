@@ -17,8 +17,8 @@ Jumper.Play.prototype = {
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
     this.scale.maxWidth = this.game.width;
     this.scale.maxHeight = this.game.height;
-    this.scale.pageAlignHorizontally = true;
-    this.scale.pageAlignVertically = true;
+    this.scale.pageAlignHorizontally = false;
+    this.scale.pageAlignVertically = false;
     this.scale.setScreenSize( true );
 
     // physics
@@ -36,58 +36,13 @@ Jumper.Play.prototype = {
 
     // cursor controls
     this.cursor = this.input.keyboard.createCursorKeys();
-    // game.input.onTap.add(function(){
-    //   console.log("ciao");
-    // },this)
-    // game.input.addPointer(2);
-    var someElement = document.getElementById("right");
-    someElement.addEventListener("mousedown", this.touchStartRight.bind(this))
-
-    var someElement = document.getElementById("right");
-    someElement.addEventListener("mouseup", this.touchEndRight.bind(this))
-
-    
-    var someElement = document.getElementById("left");
-    someElement.addEventListener("mousedown", this.touchStartLeft.bind(this))
-
-    var someElement = document.getElementById("left");
-    someElement.addEventListener("mouseup", this.touchEndLeft.bind(this))
-
-
-    this.move = 0;
-    this.contatore = 0;
+  
+    //click controls
+    this.game.input.onDown.add(this.moveHeroByClick, this);
   },
-
-  touchStartRight: function(){
-   // alert("Destra");
-    this.move = 1;
-  },
-
-  touchEndRight: function(){
-    // alert("Destra");
-     this.move = 0;
-     this.contatore = 0;
-   },
-
-  touchStartLeft: function(){
-    // alert("Sinistra");
-     this.move = -1;
-   },
- 
-   touchEndLeft: function(){
-    // alert("Sinistra");
-     this.move = 0;
-     this.contatore = 0;
-   },
 
   update: function() {
-    console.log(this.move);
-    // if(game.input.pointer1.active){
-    //   alert("ciao");
-    // }
-    // if(this.input.activePointer.isDown){
-    //   alert("ciao 2");
-    // }
+
     // this is where the main magic happens
     // the y offset and the height of the world are adjusted
     // to match the highest point the hero has reached
@@ -121,17 +76,6 @@ Jumper.Play.prototype = {
     let index = platformIndex % 2;
     this.platformsCreateOne( array[index], y, 50);
     platformIndex++;
-  },
-
-
-  shutdown: function() {
-    // reset everything, or the world will be messed up
-    this.world.setBounds( 0, 0, this.game.width, this.game.height );
-    this.cursor = null;
-    this.hero.destroy();
-    this.hero = null;
-    this.platforms.destroy();
-    this.platforms = null;
   },
 
   platformsCreate: function() {
@@ -178,6 +122,22 @@ Jumper.Play.prototype = {
     this.hero.body.checkCollision.right = false;
   },
 
+  moveHeroByClick: function() {
+
+    console.log('click');
+
+    if( !this.hero.body.touching.down ) {
+      return;
+    }
+    this.hero.body.velocity.y = -350;
+    if ( this.game.input.activePointer.x > this.game.width/2 ){
+      this.hero.body.velocity.x = 50;
+    } else {
+      this.hero.body.velocity.x = -50;
+    }
+
+  },
+
   heroMove: function() {
     // handle the left and right movement of the hero
     // if(game.input.pointer1.isDown){
@@ -196,8 +156,24 @@ Jumper.Play.prototype = {
     if( this.cursor.up.isDown && this.hero.body.touching.down ) {
       this.hero.body.velocity.y = -350;
     } */
+
+    let currentTime = this.game.time.time;
+    if ( this.hero.body.touching.down ) {
+      this.hero.body.velocity.x = 0;
+    }
     
-    if (this.move == 1){
+    // wrap world coordinated so that you can warp from left to right and right to left
+    this.world.wrap( this.hero, this.hero.width / 2, false );
+
+    // track the maximum amount that the hero has travelled
+    this.hero.yChange = Math.max( this.hero.yChange, Math.abs( this.hero.y - this.hero.yOrig ) );
+    
+    // if the hero falls below the camera view, gameover
+    if( this.hero.y > this.cameraYMin + this.game.height && this.hero.alive ) {
+      this.state.start( 'Play' );
+    }
+    
+    /* if (this.move == 1){
       this.hero.body.velocity.x = 200;
       if(this.contatore < 20){
         this.hero.body.velocity.y = -200;
@@ -214,18 +190,19 @@ Jumper.Play.prototype = {
     }
     else {
       this.hero.body.velocity.x =0;
-    }
-    // wrap world coordinated so that you can warp from left to right and right to left
-    this.world.wrap( this.hero, this.hero.width / 2, false );
+    } */
 
-    // track the maximum amount that the hero has travelled
-    this.hero.yChange = Math.max( this.hero.yChange, Math.abs( this.hero.y - this.hero.yOrig ) );
-    
-    // if the hero falls below the camera view, gameover
-    if( this.hero.y > this.cameraYMin + this.game.height && this.hero.alive ) {
-      this.state.start( 'Play' );
-    }
-  }
+  },
+
+  shutdown: function() {
+    // reset everything, or the world will be messed up
+    this.world.setBounds( 0, 0, this.game.width, this.game.height );
+    this.cursor = null;
+    this.hero.destroy();
+    this.hero = null;
+    this.platforms.destroy();
+    this.platforms = null;
+  },
 }
 
 var height = document.getElementById("game-container").offsetHeight;
