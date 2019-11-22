@@ -105,7 +105,7 @@ Jumper.Play.prototype = {
   heroCreate: function() {
     // basic hero setup
     this.hero = game.add.sprite( this.world.centerX, this.world.height - 100, 'hero' );
-    this.hero.scale.setTo(0.2,0.2)
+    this.hero.scale.setTo(0.12, 0.12)
     this.hero.anchor.set( 0.5 );
     
     // track where the hero started and how much the distance has changed from that point
