@@ -37,8 +37,6 @@ Jumper.Play.prototype = {
     // cursor controls
     this.cursor = this.input.keyboard.createCursorKeys();
   
-    //click controls
-    this.game.input.onDown.add(this.moveHeroByClick, this);
     this.game.input.onTap.add(this.moveHeroByClick, this);
   },
 
@@ -107,7 +105,7 @@ Jumper.Play.prototype = {
 
   heroCreate: function() {
     // basic hero setup
-    this.hero = game.add.sprite( this.world.centerX, this.world.height - 36, 'hero' );
+    this.hero = game.add.sprite( this.world.centerX, this.world.height - 100, 'hero' );
     this.hero.scale.setTo(0.2,0.2)
     this.hero.anchor.set( 0.5 );
     
@@ -118,7 +116,7 @@ Jumper.Play.prototype = {
     // hero collision setup
     // disable all collisions except for down
     this.physics.arcade.enable( this.hero );
-    //this.hero.body.gravity.y = 500;
+    this.hero.body.gravity.y = 500;
     this.hero.body.checkCollision.up = false;
     this.hero.body.checkCollision.left = false;
     this.hero.body.checkCollision.right = false;
