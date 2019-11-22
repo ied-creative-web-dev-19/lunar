@@ -19,7 +19,6 @@ Jumper.Play.prototype = {
     this.scale.maxHeight = this.game.height;
     this.scale.pageAlignHorizontally = false;
     this.scale.pageAlignVertically = false;
-    this.scale.setScreenSize( true );
 
     // physics
     this.physics.startSystem( Phaser.Physics.ARCADE );
