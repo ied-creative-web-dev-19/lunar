@@ -155,7 +155,7 @@ Jumper.Play.prototype = {
     console.log(heroX, heroY);
 
     // calculate parabole velocities
-    let xVelocity = Math.abs( ( heroX - platformXMin ) * 0.6 );
+    let xVelocity = Math.abs( ( heroX - platformXMin ) * 0.7);
     let yVelocity = -450;
 
     jumpVelocities[0] = xVelocity;
