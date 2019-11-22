@@ -5,6 +5,4 @@ TODO
 - Inserire la grafica
 - [NICE TO HAVE] Creare asteroidi o alieni ogni tot tempo random che se in collisione con il player lo uccidano
 
-- Riportarlo in Ionic
-
 - Caricarlo su di un Hosting / Configurare l'hosting / ottenere credenziali FTP
