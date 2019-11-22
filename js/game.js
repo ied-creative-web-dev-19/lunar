@@ -96,6 +96,7 @@ Jumper.Play.prototype = {
 
   createMissleFloor() {
     this.missle = this.game.add.sprite( 200, 200, 'razzo' );
+    this.game.physics.arcade.enable(this.missle);
     y = this.world.height + 60;
     x = this.world.width / 2;
     this.missle.enableBody = true;
@@ -104,6 +105,7 @@ Jumper.Play.prototype = {
     this.missle.scale.y = 1;
     this.missle.anchor.set( 0.5 );
     this.missle.immovable = true;
+    this.missle.body.immovable = true;
     this.missle.angle = 90;
   },
 
@@ -121,7 +123,7 @@ Jumper.Play.prototype = {
 
   heroCreate: function() {
     // basic hero setup
-    this.hero = game.add.sprite( this.world.centerX, this.world.height - 100, 'hero' );
+    this.hero = this.game.add.sprite( this.world.centerX, this.world.height - 100, 'hero' );
     this.hero.scale.setTo(0.12, 0.12)
     this.hero.anchor.set( 0.5 );
     
