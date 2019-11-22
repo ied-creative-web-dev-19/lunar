@@ -7,11 +7,14 @@ Jumper.Play.prototype = {
   preload: function() {
     this.load.image( 'hero', 'assets/astronauta.png' );
     this.load.image( 'pixel', 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/836/pixel_1.png' );
+    this.load.image( 'asteroide', 'assets/asteroide.png');
+    this.load.image('bg', 'assets/sfondo.jpg')
   },
 
   create: function() {
     // background color
     this.stage.backgroundColor = '#6bf';
+    //this.bg = this.game.add.tileSprite(0, 0, 750, 1334, 'bg');
 
     // scaling
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -64,7 +67,7 @@ Jumper.Play.prototype = {
       
       if( elem.y > this.camera.y + this.game.height ) {
         elem.kill();
-        this.platformSpawn(this.platformYMin - 100, 50);
+        this.platformSpawn(this.platformYMin - 150, 50);
       }
     }, this );
   },
@@ -80,11 +83,11 @@ Jumper.Play.prototype = {
     // platform basic setup
     this.platforms = this.add.group();
     this.platforms.enableBody = true;
-    this.platforms.createMultiple( 10, 'pixel' );
+    this.platforms.createMultiple( 10, 'asteroide');
 
     // create the base platform, with buffer on either side so that the hero doesn't fall through
     this.platformsCreateOne( -16, this.world.height - 16, this.world.width * 2 + 40 );
-    let array = [this.game.width * 0.25 , this.game.width * 0.75];
+    
     // create a batch of platforms that start to move up the level
     for( var i = 0; i < 9; i++ ) {
       this.platformSpawn( this.world.height - 150 * i, 50 );
@@ -95,8 +98,8 @@ Jumper.Play.prototype = {
     // this is a helper function since writing all of this out can get verbose elsewhere
     var platform = this.platforms.getFirstDead();
     platform.reset( x, y );
-    platform.scale.x = width;
-    platform.scale.y = 16;
+    platform.scale.x = 1;
+    platform.scale.y = 1;
     platform.x -= width * 0.5;
     platform.body.immovable = true;
     return platform;
