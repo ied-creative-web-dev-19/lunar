@@ -5,7 +5,7 @@ let platformIndex = 0;
 Jumper.Play.prototype = {
 
   preload: function() {
-    this.load.image( 'hero', 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/836/dude.png' );
+    this.load.image( 'hero', 'assets/astronauta.png' );
     this.load.image( 'pixel', 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/836/pixel_1.png' );
   },
 
@@ -107,6 +107,7 @@ Jumper.Play.prototype = {
   heroCreate: function() {
     // basic hero setup
     this.hero = game.add.sprite( this.world.centerX, this.world.height - 36, 'hero' );
+    this.hero.scale.setTo(0.2,0.2)
     this.hero.anchor.set( 0.5 );
     
     // track where the hero started and how much the distance has changed from that point
@@ -116,7 +117,7 @@ Jumper.Play.prototype = {
     // hero collision setup
     // disable all collisions except for down
     this.physics.arcade.enable( this.hero );
-    this.hero.body.gravity.y = 500;
+    //this.hero.body.gravity.y = 500;
     this.hero.body.checkCollision.up = false;
     this.hero.body.checkCollision.left = false;
     this.hero.body.checkCollision.right = false;
@@ -155,7 +156,7 @@ Jumper.Play.prototype = {
     console.log(heroX, heroY);
 
     // calculate parabole velocities
-    let xVelocity = Math.abs( ( heroX - platformXMin ) * 0.7);
+    let xVelocity = Math.abs( ( heroX - platformXMin ) * 0.7 );
     let yVelocity = -450;
 
     jumpVelocities[0] = xVelocity;
