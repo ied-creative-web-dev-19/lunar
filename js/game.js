@@ -8,6 +8,7 @@ Jumper.Play.prototype = {
     this.load.image( 'hero', 'assets/astronauta.png' );
     this.load.image( 'pixel', 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/836/pixel_1.png' );
     this.load.image( 'asteroide', 'assets/asteroide.png');
+    this.load.image( 'razzo', 'assets/razzo.png');
     this.load.image('bg', 'assets/sfondo.jpg')
   },
 
@@ -32,6 +33,7 @@ Jumper.Play.prototype = {
 
     // create platforms
     this.platformsCreate();
+    this.createMissleFloor();
 
     // create hero
     this.heroCreate();
@@ -56,6 +58,7 @@ Jumper.Play.prototype = {
 
     // hero collisions and movement
     this.physics.arcade.collide( this.hero, this.platforms );
+    this.physics.arcade.collide( this.hero, this.missle );
     this.heroMove();
 
     // for each plat form, find out which is the highest
@@ -84,9 +87,6 @@ Jumper.Play.prototype = {
     this.platforms = this.add.group();
     this.platforms.enableBody = true;
     this.platforms.createMultiple( 10, 'asteroide');
-
-    // create the base platform, with buffer on either side so that the hero doesn't fall through
-    this.platformsCreateOne( -16, this.world.height - 16, this.world.width * 2 + 40 );
     
     // create a batch of platforms that start to move up the level
     for( var i = 0; i < 9; i++ ) {
@@ -94,14 +94,28 @@ Jumper.Play.prototype = {
     }
   },
 
+  createMissleFloor() {
+    this.missle = this.game.add.sprite( 200, 200, 'razzo' );
+    y = this.world.height + 60;
+    x = this.world.width / 2;
+    this.missle.enableBody = true;
+    this.missle.reset( x, y );
+    this.missle.scale.x = 1;
+    this.missle.scale.y = 1;
+    this.missle.anchor.set( 0.5 );
+    this.missle.immovable = true;
+    this.missle.angle = 90;
+  },
+
   platformsCreateOne: function( x, y, width ) {
     // this is a helper function since writing all of this out can get verbose elsewhere
     var platform = this.platforms.getFirstDead();
     platform.reset( x, y );
-    platform.scale.x = 1;
-    platform.scale.y = 1;
+    platform.scale.x = 0.1;
+    platform.scale.y = 0.1;
     platform.x -= width * 0.5;
     platform.body.immovable = true;
+
     return platform;
   },
 
@@ -230,6 +244,8 @@ Jumper.Play.prototype = {
     this.hero = null;
     this.platforms.destroy();
     this.platforms = null;
+    this.missle.destroy();
+    this.missle = null;
   },
 }
 
