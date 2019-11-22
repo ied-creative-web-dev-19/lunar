@@ -39,6 +39,7 @@ Jumper.Play.prototype = {
   
     //click controls
     this.game.input.onDown.add(this.moveHeroByClick, this);
+    this.game.input.onTap.add(this.moveHeroByClick, this);
   },
 
   update: function() {
