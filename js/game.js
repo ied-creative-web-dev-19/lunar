@@ -113,8 +113,8 @@ Jumper.Play.prototype = {
     // this is a helper function since writing all of this out can get verbose elsewhere
     var platform = this.platforms.getFirstDead();
     platform.reset( x, y );
-    platform.scale.x = 0.1;
-    platform.scale.y = 0.1;
+    platform.scale.x = 0.25;
+    platform.scale.y = 0.25;
     platform.x -= width * 0.5;
     platform.body.immovable = true;
 
