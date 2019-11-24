@@ -67,7 +67,7 @@ Jumper.Play.prototype = {
       
       if( elem.y > this.camera.y + this.game.height ) {
         elem.kill();
-        this.platformSpawn(this.platformYMin - 150, 50);
+        this.platformSpawn(this.platformYMin - 200, 50);
       }
     }, this );
   },
@@ -80,12 +80,12 @@ Jumper.Play.prototype = {
     
     // create a batch of platforms that start to move up the level
     for( var i = 0; i < 9; i++ ) {
-      this.platformSpawn( this.world.height - 150 * i, 50 );
+      this.platformSpawn( this.world.height - 200 * i, 50 );
     }
   },
 
   platformSpawn: function(y) {
-    let array = [this.game.width * 0.25 , this.game.width * 0.75];
+    let array = [this.game.width * 0.15 , this.game.width * 0.65];
     let index = platformIndex % 2;
     this.platformsCreateOne( array[index], y, 50);
     platformIndex++;
