@@ -9,7 +9,7 @@ Jumper.Play.prototype = {
     this.load.image( 'pixel', 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/836/pixel_1.png' );
     this.load.image( 'asteroide', 'assets/asteroide.png');
     this.load.image( 'razzo', 'assets/razzo.png');
-    this.load.image('bg', 'assets/sfondo.jpg')
+    this.load.image( 'bg', 'assets/sfondo.jpg');
   },
 
   create: function() {
@@ -25,7 +25,7 @@ Jumper.Play.prototype = {
     this.scale.pageAlignVertically = false;
 
     // physics
-    this.physics.startSystem( Phaser.Physics.ARCADE );
+    this.physics.startSystem( Phaser.Physics.Arcade );
 
     // camera and platform tracking vars
     this.cameraYMin = 99999;
@@ -37,9 +37,6 @@ Jumper.Play.prototype = {
 
     // create hero
     this.heroCreate();
-
-    // cursor controls
-    this.cursor = this.input.keyboard.createCursorKeys();
   
     this.game.input.onTap.add(this.moveHeroByClick, this);
   },
@@ -57,8 +54,8 @@ Jumper.Play.prototype = {
     this.camera.y = this.cameraYMin;
 
     // hero collisions and movement
-    this.physics.arcade.collide( this.hero, this.platforms );
-    this.physics.arcade.collide( this.hero, this.missle );
+    this.physics.arcade.collide( this.hero, this.platforms, ()=>{console.log("platforms collision")} );
+    this.physics.arcade.collide( this.hero, this.missle, ()=>{console.log("missle collision")} );
     this.heroMove();
 
     // for each plat form, find out which is the highest
@@ -75,13 +72,6 @@ Jumper.Play.prototype = {
     }, this );
   },
 
-  platformSpawn: function(y) {
-    let array = [this.game.width * 0.25 , this.game.width * 0.75];
-    let index = platformIndex % 2;
-    this.platformsCreateOne( array[index], y, 50);
-    platformIndex++;
-  },
-
   platformsCreate: function() {
     // platform basic setup
     this.platforms = this.add.group();
@@ -94,19 +84,11 @@ Jumper.Play.prototype = {
     }
   },
 
-  createMissleFloor() {
-    this.missle = this.game.add.sprite( 200, 200, 'razzo' );
-    this.game.physics.arcade.enable(this.missle);
-    y = this.world.height + 60;
-    x = this.world.width / 2;
-    this.missle.enableBody = true;
-    this.missle.reset( x, y );
-    this.missle.scale.x = 1;
-    this.missle.scale.y = 1;
-    this.missle.anchor.set( 0.5 );
-    this.missle.immovable = true;
-    this.missle.body.immovable = true;
-    this.missle.angle = 90;
+  platformSpawn: function(y) {
+    let array = [this.game.width * 0.25 , this.game.width * 0.75];
+    let index = platformIndex % 2;
+    this.platformsCreateOne( array[index], y, 50);
+    platformIndex++;
   },
 
   platformsCreateOne: function( x, y, width ) {
@@ -121,9 +103,28 @@ Jumper.Play.prototype = {
     return platform;
   },
 
+  createMissleFloor() {
+    this.missle = this.game.add.sprite( 200, 200, 'razzo' );
+    y = this.world.height + 60;
+    x = this.world.width / 2;
+    this.missle.reset( x, y );
+    this.missle.scale.x = 1;
+    this.missle.scale.y = 1;
+    this.missle.anchor.set( 0.5 );
+
+    this.game.physics.arcade.enable(this.missle);
+    this.missle.enableBody = true;
+    this.missle.immovable = true;
+    this.missle.body.immovable = true;
+    this.missle.body.checkCollision.down = true;
+    this.missle.body.checkCollision.up = true;
+    this.missle.body.checkCollision.left = true;
+    this.missle.body.checkCollision.right = true;
+  },
+
   heroCreate: function() {
     // basic hero setup
-    this.hero = this.game.add.sprite( this.world.centerX, this.world.height - 100, 'hero' );
+    this.hero = this.game.add.sprite( this.world.centerX, this.world.height - 80, 'hero' );
     this.hero.scale.setTo(0.12, 0.12)
     this.hero.anchor.set( 0.5 );
     
@@ -133,7 +134,7 @@ Jumper.Play.prototype = {
 
     // hero collision setup
     // disable all collisions except for down
-    this.physics.arcade.enable( this.hero );
+    this.game.physics.arcade.enable(this.hero);
     this.hero.body.gravity.y = 500;
     this.hero.body.checkCollision.up = false;
     this.hero.body.checkCollision.left = false;
@@ -156,7 +157,7 @@ Jumper.Play.prototype = {
   },
 
   getJumpVelocitiesForNextPlatform: function() {
-    const jumpVelocities = [10, 10];
+    const jumpVelocities = [0, 0];
 
     const heroX = this.hero.position.x;
     const heroY = this.hero.position.y;
@@ -173,7 +174,7 @@ Jumper.Play.prototype = {
     console.log(heroX, heroY);
 
     // calculate parabole velocities
-    let xVelocity = Math.abs( ( heroX - platformXMin ) * 0.7 );
+    let xVelocity = Math.abs( ( heroX - platformXMin ) * 0.8 );
     let yVelocity = -450;
 
     jumpVelocities[0] = xVelocity;
@@ -183,25 +184,7 @@ Jumper.Play.prototype = {
   },
 
   heroMove: function() {
-    // handle the left and right movement of the hero
-    // if(game.input.pointer1.isDown){
-    //   console.log("ciao");
-    // }
-    /*
-    if( this.cursor.left.isDown ) {
-      this.hero.body.velocity.x = -200;
-    } else if( this.cursor.right.isDown ) {
-      this.hero.body.velocity.x = 200;
-    } else {
-      this.hero.body.velocity.x = 0;
-    }
 
-    // handle hero jumping
-    if( this.cursor.up.isDown && this.hero.body.touching.down ) {
-      this.hero.body.velocity.y = -350;
-    } */
-
-    let currentTime = this.game.time.time;
     if ( this.hero.body.touching.down ) {
       this.hero.body.velocity.x = 0;
     }
@@ -216,32 +199,12 @@ Jumper.Play.prototype = {
     if( this.hero.y > this.cameraYMin + this.game.height && this.hero.alive ) {
       this.state.start( 'Play' );
     }
-    
-    /* if (this.move == 1){
-      this.hero.body.velocity.x = 200;
-      if(this.contatore < 20){
-        this.hero.body.velocity.y = -200;
-      }
-      this.contatore += 1;
-    }
-
-    else if (this.move == -1){
-      this.hero.body.velocity.x = -200;
-      if(this.contatore < 20){
-        this.hero.body.velocity.y = -200;
-      }
-      this.contatore += 1;
-    }
-    else {
-      this.hero.body.velocity.x =0;
-    } */
 
   },
 
   shutdown: function() {
     // reset everything, or the world will be messed up
     this.world.setBounds( 0, 0, this.game.width, this.game.height );
-    this.cursor = null;
     this.hero.destroy();
     this.hero = null;
     this.platforms.destroy();
