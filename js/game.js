@@ -80,9 +80,12 @@ Jumper.Play.prototype = {
     this.platforms = this.add.group();
     this.platforms.enableBody = true;
     this.platforms.createMultiple( 10, 'asteroide');
+
+    let howManyPlatform = Math.floor(this.world.height / 200) + 1;
+    console.log('howManyPlatform',howManyPlatform);
     
     // create a batch of platforms that start to move up the level
-    for( var i = 0; i < 2; i++ ) {
+    for( var i = 0; i < howManyPlatform; i++ ) {
       this.platformSpawn( this.world.height - 200 * ( i + 1 ) );
     }
   },
@@ -205,13 +208,18 @@ Jumper.Play.prototype = {
     }
     
     // wrap world coordinated so that you can warp from left to right and right to left
-    this.world.wrap( this.hero, this.hero.width / 2, false );
+    // this.world.wrap( this.hero, this.hero.width / 2, false );
 
     // track the maximum amount that the hero has travelled
     this.hero.yChange = Math.max( this.hero.yChange, Math.abs( this.hero.y - this.hero.yOrig ) );
     
     // if the hero falls below the camera view, gameover
     if( this.hero.y > this.cameraYMin + this.game.height && this.hero.alive ) {
+      this.state.start( 'Play' );
+    }
+
+    // if the hero falls aside, gameover
+    if( this.hero.alive && ( this.hero.x > this.game.width || this.hero.x < 0 ) ) {
       this.state.start( 'Play' );
     }
 
