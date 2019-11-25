@@ -54,8 +54,8 @@ Jumper.Play.prototype = {
     this.camera.y = this.cameraYMin;
 
     // hero collisions and movement
-    this.physics.arcade.collide( this.hero, this.platforms, ()=>{console.log("platforms collision")} );
-    this.physics.arcade.collide( this.hero, this.missle, ()=>{console.log("missle collision")} );
+    this.physics.arcade.collide( this.hero, this.platforms );
+    this.physics.arcade.collide( this.hero, this.missle );
     this.heroMove();
 
     // for each plat form, find out which is the highest
@@ -67,7 +67,7 @@ Jumper.Play.prototype = {
       
       if( elem.y > this.camera.y + this.game.height ) {
         elem.kill();
-        this.platformSpawn(this.platformYMin - 200, 50);
+        this.platformSpawn(this.platformYMin - 200 );
       }
     }, this );
   },
@@ -79,25 +79,26 @@ Jumper.Play.prototype = {
     this.platforms.createMultiple( 10, 'asteroide');
     
     // create a batch of platforms that start to move up the level
-    for( var i = 0; i < 9; i++ ) {
-      this.platformSpawn( this.world.height - 200 * i, 50 );
+    for( var i = 0; i < 2; i++ ) {
+      this.platformSpawn( this.world.height - 200 * ( i + 1 ) );
     }
   },
 
   platformSpawn: function(y) {
-    let array = [this.game.width * 0.15 , this.game.width * 0.65];
+    let array = [this.world.width * 0.25 , this.world.width * 0.75];
     let index = platformIndex % 2;
-    this.platformsCreateOne( array[index], y, 50);
+    this.platformsCreateOne( array[index], y);
     platformIndex++;
   },
 
-  platformsCreateOne: function( x, y, width ) {
+  platformsCreateOne: function( x, y ) {
     // this is a helper function since writing all of this out can get verbose elsewhere
     var platform = this.platforms.getFirstDead();
     platform.reset( x, y );
-    platform.scale.x = 0.25;
+    platform.scale.x = 0.25; // asteroid its 595 x 595 px, so, 0.25 factor is 148.75 =~ 150
     platform.scale.y = 0.25;
-    platform.x -= width * 0.5;
+    platform.x -= 75;
+    platform.y -= 75;
     platform.body.immovable = true;
 
     return platform;
@@ -124,7 +125,7 @@ Jumper.Play.prototype = {
 
   heroCreate: function() {
     // basic hero setup
-    this.hero = this.game.add.sprite( this.world.centerX, this.world.height - 80, 'hero' );
+    this.hero = this.game.add.sprite( this.world.centerX, this.world.height - 300, 'hero' );
     this.hero.scale.setTo(0.12, 0.12)
     this.hero.anchor.set( 0.5 );
     
@@ -161,20 +162,21 @@ Jumper.Play.prototype = {
 
     const heroX = this.hero.position.x;
     const heroY = this.hero.position.y;
-    let platformXMin = 0;
-    let platformYMin = 0;
+    let lowerPlatformX = Number.MIN_SAFE_INTEGER;
+    let lowerPlatformY = Number.MIN_SAFE_INTEGER;
     this.platforms.forEachAlive((platform) => {
-      if ( platform.position.y < platformYMin ) {
-        platformYMin = platform.position.y;
-        platformXMin =  platform.position.x;
+      console.log('platforms order (y):', platform.position.y, '(x):', platform.position.x);
+      if ( platform.position.y > lowerPlatformY ) {
+        lowerPlatformY = platform.position.y;
+        lowerPlatformX =  platform.position.x;
       }
     });
 
-    console.log(platformXMin, platformYMin);
-    console.log(heroX, heroY);
+    console.log('hero position: ', heroX, heroY);
+    console.log('next platform position: ', lowerPlatformX, lowerPlatformY);
 
     // calculate parabole velocities
-    let xVelocity = Math.abs( ( heroX - platformXMin ) * 0.7 );
+    let xVelocity = ( Math.abs(heroX) - Math.abs(lowerPlatformX) ) * 0.7;
     let yVelocity = -450;
 
     jumpVelocities[0] = xVelocity;
