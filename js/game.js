@@ -2,6 +2,8 @@ var Jumper = function() {};
 Jumper.Play = function() {};
 let platformIndex = 0;
 
+var spawnAllowed = true;
+
 Jumper.Play.prototype = {
 
   preload: function() {
@@ -10,6 +12,8 @@ Jumper.Play.prototype = {
     this.load.image( 'asteroide', 'assets/asteroide.png');
     this.load.image( 'razzo', 'assets/razzo.png');
     this.load.image( 'bg', 'assets/sfondo.jpg');
+    this.load.image( 'flame_asteroid', 'assets/asteroide_infuocata.png');
+    this.load.image( 'aliens', 'assets/alieni.png');
   },
 
   create: function() {
@@ -40,7 +44,13 @@ Jumper.Play.prototype = {
 
     //
     this.isFirstJump = true;
-  
+
+    // create enemies
+    this.asteroidGroup = this.game.add.group(); // create group
+    this.alienGroup = this.game.add.group(); // create group
+    this.game.time.events.add( 3000 , this.createNewEnemy, this);
+
+
     this.game.input.onTap.add(this.moveHeroByClick, this);
   },
 
@@ -64,7 +74,23 @@ Jumper.Play.prototype = {
     // hero collisions and movement
     this.physics.arcade.collide( this.hero, this.platforms );
     this.physics.arcade.collide( this.hero, this.rocket );
+    this.physics.arcade.overlap( this.hero, this.asteroidGroup, this.checkEnemyTouch );
+    this.physics.arcade.overlap( this.hero, this.alienGroup, this.checkEnemyTouch );
     this.heroMove();
+
+    // asteroids killer
+    this.asteroidGroup.forEachAlive( function( elem ) {
+      if( elem.y > this.camera.y + this.game.height ) {
+        elem.kill();
+      }
+    }, this );
+
+    // alien killer
+    this.alienGroup.forEachAlive( function( elem ) {
+      if( elem.y > this.camera.y + this.game.height ) {
+        elem.kill();
+      }
+    }, this );
 
     // for each plat form, find out which is the highest
     // if one goes below the camera view, then create a new one at a distance from the highest one
@@ -227,6 +253,74 @@ Jumper.Play.prototype = {
       this.state.start( 'Play' );
     }
 
+  },
+
+  createNewEnemy() {
+    console.log('createNewEnemy',this.game.width - 100, this.cameraYMin - 100);
+    if (spawnAllowed) {
+      if ( this.game.rnd.integerInRange(1, 2) % 2 == 0 ) {
+        this.spawnAsteroid();
+      } else {
+        this.spawnAlien();
+      }
+      this.queueEnemy( this.game.rnd.integerInRange(1500, 2000) ); // call enemy queue for random between 2.5 and 5 seconds
+    }
+  },
+
+  queueEnemy(time) {
+    this.game.time.events.add(time, this.createNewEnemy, this); // add a timer that gets called once, then auto disposes to create a new enemy after the time given
+  },
+
+  spawnAsteroid: function() {
+
+    let aRandomNumber = this.game.rnd.integerInRange(1000, 9000); // genera un numero a caso tra 1000 e 9000
+
+    let asteroid = this.asteroidGroup.create( this.game.width - 1, this.cameraYMin + 300, 'flame_asteroid');
+    asteroid.scale.x = 0.25;
+    asteroid.scale.y = 0.25;
+    asteroid.anchor.set( 0.5 );
+
+    this.game.physics.arcade.enable(asteroid);
+    asteroid.enableBody = true;
+    asteroid.immovable = true;
+    asteroid.body.immovable = true;
+    asteroid.body.checkCollision.down = true;
+    asteroid.body.checkCollision.up = true;
+    asteroid.body.checkCollision.left = true;
+    asteroid.body.checkCollision.right = true;
+
+    asteroid.body.velocity.x = -100;
+    asteroid.body.velocity.y = 30;
+  },
+
+  spawnAlien: function() {
+
+    let aRandomNumber = this.game.rnd.integerInRange(1000, 9000);
+
+    let alien = this.alienGroup.create( this.game.width - 1, this.cameraYMin + 400, 'aliens');
+    alien.scale.x = 0.25;
+    alien.scale.y = 0.25;
+    alien.anchor.set( 0.5 );
+
+    this.game.physics.arcade.enable(alien);
+    alien.enableBody = true;
+    alien.immovable = true;
+    alien.body.immovable = true;
+    alien.body.checkCollision.down = true;
+    alien.body.checkCollision.up = true;
+    alien.body.checkCollision.left = true;
+    alien.body.checkCollision.right = true;
+
+    alien.body.velocity.x = -80;
+    alien.body.velocity.y = 40;
+  },
+
+  checkEnemyTouch: function(hero, enemy){
+
+  },
+
+  playerDie: function() {
+    this.state.start( 'Play' );
   },
 
   shutdown: function() {

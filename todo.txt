@@ -1,8 +1,7 @@
 TODO
 
-- [HIGH]Correggere e migliorare il salto del personaggio nel gioco
-- [NICE TO HAVE] Creare sistema che ogni X (random) piattaforme faccia in modo che una di esse si sgretoli dopo un tot di secondi che il personaggi vi risiede
 - Inserire la grafica
+- [NICE TO HAVE] Creare sistema che ogni X (random) piattaforme faccia in modo che una di esse si sgretoli dopo un tot di secondi che il personaggi vi risiede
 - [NICE TO HAVE] Creare asteroidi o alieni ogni tot tempo random che se in collisione con il player lo uccidano
 
 - Caricarlo su di un Hosting / Configurare l'hosting / ottenere credenziali FTP
