@@ -25,7 +25,7 @@ Jumper.Play.prototype = {
     this.scale.pageAlignVertically = false;
 
     // physics
-    this.physics.startSystem( Phaser.Physics.Arcade );
+    this.physics.startSystem( Phaser.Physics.P2 );
 
     // camera and platform tracking vars
     this.cameraYMin = 99999;
@@ -33,10 +33,13 @@ Jumper.Play.prototype = {
 
     // create platforms
     this.platformsCreate();
-    this.createMissleFloor();
+    this.createRocketFloor();
 
     // create hero
     this.heroCreate();
+
+    //
+    this.isFirstJump = true;
   
     this.game.input.onTap.add(this.moveHeroByClick, this);
   },
@@ -55,7 +58,7 @@ Jumper.Play.prototype = {
 
     // hero collisions and movement
     this.physics.arcade.collide( this.hero, this.platforms );
-    this.physics.arcade.collide( this.hero, this.missle );
+    this.physics.arcade.collide( this.hero, this.rocket );
     this.heroMove();
 
     // for each plat form, find out which is the highest
@@ -65,7 +68,7 @@ Jumper.Play.prototype = {
     this.platforms.forEachAlive( function( elem ) {
       this.platformYMin = Math.min( this.platformYMin, elem.y );
       
-      if( elem.y > this.camera.y + this.game.height ) {
+      if( elem.y > this.camera.y + this.game.height + 100 ) {
         elem.kill();
         this.platformSpawn(this.platformYMin - 200 );
       }
@@ -95,37 +98,38 @@ Jumper.Play.prototype = {
     // this is a helper function since writing all of this out can get verbose elsewhere
     var platform = this.platforms.getFirstDead();
     platform.reset( x, y );
+    platform.anchor.set( 0.5 );
     platform.scale.x = 0.25; // asteroid its 595 x 595 px, so, 0.25 factor is 148.75 =~ 150
     platform.scale.y = 0.25;
-    platform.x -= 75;
-    platform.y -= 75;
+    //platform.x -= 75;
+    //platform.y -= 75;
     platform.body.immovable = true;
 
     return platform;
   },
 
-  createMissleFloor() {
-    this.missle = this.game.add.sprite( 200, 200, 'razzo' );
+  createRocketFloor() {
+    this.rocket = this.game.add.sprite( 200, 200, 'razzo' );
     y = this.world.height + 60;
     x = this.world.width / 2;
-    this.missle.reset( x, y ); 
-    this.missle.scale.x = 1;
-    this.missle.scale.y = 1;
-    this.missle.anchor.set( 0.5 );
+    this.rocket.reset( x, y );
+    this.rocket.scale.x = 1;
+    this.rocket.scale.y = 1;
+    this.rocket.anchor.set( 0.5 );
 
-    this.game.physics.arcade.enable(this.missle);
-    this.missle.enableBody = true;
-    this.missle.immovable = true;
-    this.missle.body.immovable = true;
-    this.missle.body.checkCollision.down = true;
-    this.missle.body.checkCollision.up = true;
-    this.missle.body.checkCollision.left = true;
-    this.missle.body.checkCollision.right = true;
+    this.game.physics.arcade.enable(this.rocket);
+    this.rocket.enableBody = true;
+    this.rocket.immovable = true;
+    this.rocket.body.immovable = true;
+    this.rocket.body.checkCollision.down = true;
+    this.rocket.body.checkCollision.up = true;
+    this.rocket.body.checkCollision.left = true;
+    this.rocket.body.checkCollision.right = true;
   },
 
   heroCreate: function() {
     // basic hero setup
-    this.hero = this.game.add.sprite( this.world.centerX, this.world.height - 300, 'hero' );
+    this.hero = this.game.add.sprite( this.world.centerX, this.world.height - 80, 'hero' );
     this.hero.scale.setTo(0.12, 0.12)
     this.hero.anchor.set( 0.5 );
     
@@ -150,7 +154,7 @@ Jumper.Play.prototype = {
     let jumpVelocities = this.getJumpVelocitiesForNextPlatform();
     console.log(jumpVelocities);
     this.hero.body.velocity.y = jumpVelocities[1];
-    if ( this.game.input.activePointer.x > this.game.width/2 ){
+    if ( this.game.input.activePointer.x > this.game.width/2 && jumpVelocities[0] > 0 || this.game.input.activePointer.x < this.game.width/2 && jumpVelocities[0] < 0 ){
       this.hero.body.velocity.x = jumpVelocities[0];
     } else {
       this.hero.body.velocity.x = -jumpVelocities[0];
@@ -166,6 +170,10 @@ Jumper.Play.prototype = {
     let lowerPlatformY = Number.MIN_SAFE_INTEGER;
     this.platforms.forEachAlive((platform) => {
       console.log('platforms order (y):', platform.position.y, '(x):', platform.position.x);
+      // if platform is lower than the player, ignore it
+      if ( platform.position.y > heroY ) {
+        return;
+      }
       if ( platform.position.y > lowerPlatformY ) {
         lowerPlatformY = platform.position.y;
         lowerPlatformX =  platform.position.x;
@@ -177,7 +185,12 @@ Jumper.Play.prototype = {
 
     // calculate parabole velocities
     let xVelocity = ( Math.abs(heroX) - Math.abs(lowerPlatformX) ) * 0.7;
-    let yVelocity = -450;
+    let yJumpMultiplier = 5.0;
+    if ( this.isFirstJump ) {
+      this.isFirstJump = false;
+      yJumpMultiplier = 4.0;
+    }
+    let yVelocity = - Math.abs( heroY - lowerPlatformY ) * yJumpMultiplier;
 
     jumpVelocities[0] = xVelocity;
     jumpVelocities[1] = yVelocity;
@@ -211,8 +224,8 @@ Jumper.Play.prototype = {
     this.hero = null;
     this.platforms.destroy();
     this.platforms = null;
-    this.missle.destroy();
-    this.missle = null;
+    this.rocket.destroy();
+    this.rocket = null;
   },
 }
 
