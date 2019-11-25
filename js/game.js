@@ -14,8 +14,8 @@ Jumper.Play.prototype = {
 
   create: function() {
     // background color
-    this.stage.backgroundColor = '#6bf';
-    //this.bg = this.game.add.tileSprite(0, 0, 750, 1334, 'bg');
+    this.stage.backgroundColor = '#000';
+    this.bg = this.game.add.tileSprite(0, 0, 750, 1334, 'bg');
 
     // scaling
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -56,6 +56,11 @@ Jumper.Play.prototype = {
     this.cameraYMin = Math.min( this.cameraYMin, this.hero.y - this.game.height + 130 );
     this.camera.y = this.cameraYMin;
 
+    //keep the bg in sync
+    if ( this.cameraYMin < 0 ) {
+      this.bg.position.y = this.cameraYMin;
+    }
+
     // hero collisions and movement
     this.physics.arcade.collide( this.hero, this.platforms );
     this.physics.arcade.collide( this.hero, this.rocket );
@@ -82,7 +87,6 @@ Jumper.Play.prototype = {
     this.platforms.createMultiple( 10, 'asteroide');
 
     let howManyPlatform = Math.floor(this.world.height / 200) + 1;
-    console.log('howManyPlatform',howManyPlatform);
     
     // create a batch of platforms that start to move up the level
     for( var i = 0; i < howManyPlatform; i++ ) {
