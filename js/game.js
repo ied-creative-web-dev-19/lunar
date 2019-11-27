@@ -263,7 +263,7 @@ Jumper.Play.prototype = {
       } else {
         this.spawnAlien();
       }
-      this.queueEnemy( this.game.rnd.integerInRange(1500, 2000) ); // call enemy queue for random between 2.5 and 5 seconds
+      this.queueEnemy( this.game.rnd.integerInRange(1500, 3500) ); // call enemy queue for random between 2.5 and 5 seconds
     }
   },
 
