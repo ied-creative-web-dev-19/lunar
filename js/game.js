@@ -263,7 +263,7 @@ Jumper.Play.prototype = {
       } else {
         this.spawnAlien();
       }
-      this.queueEnemy( this.game.rnd.integerInRange(1500, 2000) ); // call enemy queue for random between 2.5 and 5 seconds
+      this.queueEnemy( this.game.rnd.integerInRange(2500, 3500) ); // call enemy queue for random between 2.5 and 5 seconds
     }
   },
 
@@ -276,8 +276,8 @@ Jumper.Play.prototype = {
     let aRandomNumber = this.game.rnd.integerInRange(1000, 9000); // genera un numero a caso tra 1000 e 9000
 
     let asteroid = this.asteroidGroup.create( this.game.width - 1, this.cameraYMin + 300, 'flame_asteroid');
-    asteroid.scale.x = 0.25;
-    asteroid.scale.y = 0.25;
+    asteroid.scale.x = 0.15;
+    asteroid.scale.y = 0.15;
     asteroid.anchor.set( 0.5 );
 
     this.game.physics.arcade.enable(asteroid);
@@ -298,8 +298,8 @@ Jumper.Play.prototype = {
     let aRandomNumber = this.game.rnd.integerInRange(1000, 9000);
 
     let alien = this.alienGroup.create( this.game.width - 1, this.cameraYMin + 400, 'aliens');
-    alien.scale.x = 0.25;
-    alien.scale.y = 0.25;
+    alien.scale.x = 0.15;
+    alien.scale.y = 0.15;
     alien.anchor.set( 0.5 );
 
     this.game.physics.arcade.enable(alien);
