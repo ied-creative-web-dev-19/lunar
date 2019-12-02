@@ -74,8 +74,8 @@ Jumper.Play.prototype = {
     // hero collisions and movement
     this.physics.arcade.collide( this.hero, this.platforms );
     this.physics.arcade.collide( this.hero, this.rocket );
-    this.physics.arcade.overlap( this.hero, this.asteroidGroup, this.checkEnemyTouch );
-    this.physics.arcade.overlap( this.hero, this.alienGroup, this.checkEnemyTouch );
+    this.physics.arcade.overlap( this.hero, this.asteroidGroup, this.checkEnemyTouch, null, this );
+    this.physics.arcade.overlap( this.hero, this.alienGroup, this.checkEnemyTouch, null, this );
     this.heroMove();
 
     // asteroids killer
@@ -282,8 +282,8 @@ Jumper.Play.prototype = {
 
     this.game.physics.arcade.enable(asteroid);
     asteroid.enableBody = true;
-    asteroid.immovable = true;
-    asteroid.body.immovable = true;
+    asteroid.immovable = false;
+    asteroid.body.immovable = false;
     asteroid.body.checkCollision.down = true;
     asteroid.body.checkCollision.up = true;
     asteroid.body.checkCollision.left = true;
@@ -304,8 +304,8 @@ Jumper.Play.prototype = {
 
     this.game.physics.arcade.enable(alien);
     alien.enableBody = true;
-    alien.immovable = true;
-    alien.body.immovable = true;
+    alien.immovable = false;
+    alien.body.immovable = false;
     alien.body.checkCollision.down = true;
     alien.body.checkCollision.up = true;
     alien.body.checkCollision.left = true;
@@ -316,7 +316,31 @@ Jumper.Play.prototype = {
   },
 
   checkEnemyTouch: function(hero, enemy){
+    console.log('checkEnemyTouch');
+    if ( !this.isDying ){
 
+      /*
+      var emitter = game.add.emitter(hero.position.x, hero.position.y, 250);
+      emitter.makeParticles('flame_asteroid', [0, 1, 2, 3, 4, 5]);
+      emitter.minParticleSpeed.setTo(-400, -400);
+      emitter.maxParticleSpeed.setTo(400, 400);
+      emitter.gravity = 0;
+      emitter.start(false, 4000, 15);
+       */
+
+      this.isDying = true;
+      hero.enableBody = false;
+      hero.body.immovable = false;
+      hero.immovable = false;
+      hero.body.checkCollision.down = false;
+      hero.body.checkCollision.up = false;
+      hero.body.checkCollision.left = false;
+      hero.body.checkCollision.right = false;
+
+      hero.body.velocity.x = 400;
+
+      setTimeout( this.playerDie, 1000 );
+    }
   },
 
   playerDie: function() {
@@ -332,6 +356,7 @@ Jumper.Play.prototype = {
     this.platforms = null;
     this.rocket.destroy();
     this.rocket = null;
+    this.isDying = false;
   },
 }
 
