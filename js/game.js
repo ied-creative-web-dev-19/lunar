@@ -9,8 +9,8 @@ Jumper.Play.prototype = {
   preload: function() {
     this.load.image( 'hero', 'assets/astronauta.png' );
     this.load.image( 'pixel', 'https://s3-us-west-2.amazonaws.com/s.cdpn.io/836/pixel_1.png' );
-    this.load.image( 'asteroide', 'assets/asteroide.png');
-    this.load.image( 'razzo', 'assets/razzo.png');
+    this.load.image( 'asteroide', 'assets/asteroide_nuova.png');
+    this.load.image( 'razzo', 'assets/razzo_nuovo.png');
     this.load.image( 'bg', 'assets/sfondo.jpg');
     this.load.image( 'flame_asteroid', 'assets/asteroide_infuocata.png');
     this.load.image( 'aliens', 'assets/alieni.png');
@@ -143,11 +143,11 @@ Jumper.Play.prototype = {
 
   createRocketFloor() {
     this.rocket = this.game.add.sprite( 200, 200, 'razzo' );
-    y = this.world.height + 60;
-    x = this.world.width / 2;
+    y = this.world.height + 53.2;
+    x = this.world.width / 2.65;
     this.rocket.reset( x, y );
-    this.rocket.scale.x = 1;
-    this.rocket.scale.y = 1;
+    this.rocket.scale.x = 0.17;
+    this.rocket.scale.y = 0.17;
     this.rocket.anchor.set( 0.5 );
 
     this.game.physics.arcade.enable(this.rocket);
@@ -163,7 +163,7 @@ Jumper.Play.prototype = {
   heroCreate: function() {
     // basic hero setup
     this.hero = this.game.add.sprite( this.world.centerX, this.world.height - 80, 'hero' );
-    this.hero.scale.setTo(0.12, 0.12)
+    this.hero.scale.setTo(0.15, 0.15)
     this.hero.anchor.set( 0.5 );
     
     // track where the hero started and how much the distance has changed from that point
@@ -195,7 +195,7 @@ Jumper.Play.prototype = {
   },
 
   getJumpVelocitiesForNextPlatform: function() {
-    const jumpVelocities = [0, 0];
+    const jumpVelocities = [1, 1];
 
     const heroX = this.hero.position.x;
     const heroY = this.hero.position.y;
@@ -218,10 +218,10 @@ Jumper.Play.prototype = {
 
     // calculate parabole velocities
     let xVelocity = ( Math.abs(heroX) - Math.abs(lowerPlatformX) ) * 0.7;
-    let yJumpMultiplier = 5.0;
+    let yJumpMultiplier = 4.3;
     if ( this.isFirstJump ) {
       this.isFirstJump = false;
-      yJumpMultiplier = 4.0;
+      yJumpMultiplier = 3.6;
     }
     let yVelocity = - Math.abs( heroY - lowerPlatformY ) * yJumpMultiplier;
 
@@ -263,7 +263,7 @@ Jumper.Play.prototype = {
       } else {
         this.spawnAlien();
       }
-      this.queueEnemy( this.game.rnd.integerInRange(2500, 3500) ); // call enemy queue for random between 2.5 and 5 seconds
+      this.queueEnemy( this.game.rnd.integerInRange(2500, 4700) ); // call enemy queue for random between 2.5 and 5 seconds
     }
   },
 
@@ -273,7 +273,7 @@ Jumper.Play.prototype = {
 
   spawnAsteroid: function() {
 
-    let aRandomNumber = this.game.rnd.integerInRange(1000, 9000); // genera un numero a caso tra 1000 e 9000
+    let aRandomNumber = this.game.rnd.integerInRange(1000, 1500); // genera un numero a caso tra 1000 e 9000
 
     let asteroid = this.asteroidGroup.create( this.game.width - 1, this.cameraYMin + 300, 'flame_asteroid');
     asteroid.scale.x = 0.15;
