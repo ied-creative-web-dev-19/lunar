@@ -1,10 +1,8 @@
 var Jumper = function() {};
 Jumper.Play = function() {};
-
 let platformIndex = 0;
-const UNSTABLE_ASTEROIDS_SPAWN_THRESHOLD = 10;
-let spawnAllowed = true;
-let unstableAsteroidCollisionId = 0;
+
+var spawnAllowed = true;
 
 Jumper.Play.prototype = {
 
@@ -15,7 +13,6 @@ Jumper.Play.prototype = {
     this.load.image( 'razzo', 'assets/razzo_nuovo.png');
     this.load.image( 'bg', 'assets/sfondo.jpg');
     this.load.image( 'flame_asteroid', 'assets/asteroide_infuocata.png');
-    this.load.image( 'unstable_asteroid', 'assets/asteroide_rotta.png');
     this.load.image( 'aliens', 'assets/alieni.png');
   },
 
@@ -49,8 +46,8 @@ Jumper.Play.prototype = {
     this.isFirstJump = true;
 
     // create enemies
-    this.flameAsteroids = this.game.add.group(); // create group
-    this.aliens = this.game.add.group(); // create group
+    this.asteroidGroup = this.game.add.group(); // create group
+    this.alienGroup = this.game.add.group(); // create group
     this.game.time.events.add( 3000 , this.createNewEnemy, this);
 
 
@@ -75,21 +72,21 @@ Jumper.Play.prototype = {
     }
 
     // hero collisions and movement
-    this.physics.arcade.collide( this.hero, this.asteroids, this.checkUnstableAsteroidCollide, null, this );
+    this.physics.arcade.collide( this.hero, this.platforms );
     this.physics.arcade.collide( this.hero, this.rocket );
-    this.physics.arcade.overlap( this.hero, this.flameAsteroids, this.checkEnemyTouch, null, this );
-    this.physics.arcade.overlap( this.hero, this.aliens, this.checkEnemyTouch, null, this );
+    this.physics.arcade.overlap( this.hero, this.asteroidGroup, this.checkEnemyTouch, null, this );
+    this.physics.arcade.overlap( this.hero, this.alienGroup, this.checkEnemyTouch, null, this );
     this.heroMove();
 
     // asteroids killer
-    this.flameAsteroids.forEachAlive( function(elem ) {
+    this.asteroidGroup.forEachAlive( function( elem ) {
       if( elem.y > this.camera.y + this.game.height ) {
         elem.kill();
       }
     }, this );
 
     // alien killer
-    this.aliens.forEachAlive( function(elem ) {
+    this.alienGroup.forEachAlive( function( elem ) {
       if( elem.y > this.camera.y + this.game.height ) {
         elem.kill();
       }
@@ -99,7 +96,7 @@ Jumper.Play.prototype = {
     // if one goes below the camera view, then create a new one at a distance from the highest one
     // these are pooled so they are very performant
 
-    this.asteroids.forEachAlive( function(elem ) {
+    this.platforms.forEachAlive( function( elem ) {
       this.platformYMin = Math.min( this.platformYMin, elem.y );
       
       if( elem.y > this.camera.y + this.game.height + 100 ) {
@@ -111,9 +108,9 @@ Jumper.Play.prototype = {
 
   platformsCreate: function() {
     // platform basic setup
-    this.asteroids = this.add.group();
-    this.asteroids.enableBody = true;
-    this.asteroids.createMultiple( 10, 'asteroide');
+    this.platforms = this.add.group();
+    this.platforms.enableBody = true;
+    this.platforms.createMultiple( 10, 'asteroide');
 
     let howManyPlatform = Math.floor(this.world.height / 200) + 1;
     
@@ -132,64 +129,16 @@ Jumper.Play.prototype = {
 
   platformsCreateOne: function( x, y ) {
     // this is a helper function since writing all of this out can get verbose elsewhere
-
-    // check if it's needed to generate an unstable asteroid with minumum limit and randomly
-    let generateUnstable = false;
-    if ( UNSTABLE_ASTEROIDS_SPAWN_THRESHOLD <= platformIndex ) {
-      let aRandomNumber = this.game.rnd.integerInRange(1, 2);
-      if ( aRandomNumber % 2 === 0 ) {
-        generateUnstable = true;
-      }
-    }
-
-    var platform = this.asteroids.getFirstDead();
-
-    if ( generateUnstable ){
-      platform.loadTexture('unstable_asteroid');
-    }
-
+    var platform = this.platforms.getFirstDead();
     platform.reset( x, y );
     platform.anchor.set( 0.5 );
-    platform.scale.x = 0.25; // asteroid its 595 x 595 px, so, 0.25 factor is 148.75 =~ 150
-    platform.scale.y = 0.25;
+    platform.scale.x = 0.23; // asteroid its 595 x 595 px, so, 0.25 factor is 148.75 =~ 150
+    platform.scale.y = 0.23;
     //platform.x -= 75;
     //platform.y -= 75;
     platform.body.immovable = true;
-    platform.body.checkCollision.down = false;
-    platform.body.checkCollision.up = true;
-    platform.body.checkCollision.left = false;
-    platform.body.checkCollision.right = false;
 
     return platform;
-  },
-
-  checkUnstableAsteroidCollide(hero, unstableAsteroid) {
-    if ( unstableAsteroid.key !== 'unstable_asteroid' ){
-      return;
-    }
-    // this check to execute code only on collision detected first time
-    if ( unstableAsteroidCollisionId !== platformIndex ) {
-      unstableAsteroidCollisionId = platformIndex;
-      var that = this;
-      setTimeout( function() {
-        that.explodeUnstableAsteroid(unstableAsteroid);
-      } , 5000 );
-    }
-  },
-
-  explodeUnstableAsteroid(unstableAsteroid) {
-    var emitter = game.add.emitter(unstableAsteroid.position.x, unstableAsteroid.position.y, 250);
-    emitter.makeParticles('pixel', [0, 1, 2, 3, 4, 5]);
-    emitter.minParticleSpeed.setTo(-400, -400);
-    emitter.maxParticleSpeed.setTo(400, 400);
-    emitter.gravity = 20;
-    emitter.start(false, 4000, 15);
-
-    unstableAsteroid.destroy();
-
-    this.hero.enableBody = false;
-    this.hero.body.checkCollision.down = false;
-    this.hero.body.velocity.y = 200;
   },
 
   createRocketFloor() {
@@ -214,7 +163,7 @@ Jumper.Play.prototype = {
   heroCreate: function() {
     // basic hero setup
     this.hero = this.game.add.sprite( this.world.centerX, this.world.height - 80, 'hero' );
-    this.hero.scale.setTo(0.15, 0.15);
+    this.hero.scale.setTo(0.15, 0.15)
     this.hero.anchor.set( 0.5 );
     
     // track where the hero started and how much the distance has changed from that point
@@ -225,10 +174,9 @@ Jumper.Play.prototype = {
     // disable all collisions except for down
     this.game.physics.arcade.enable(this.hero);
     this.hero.body.gravity.y = 500;
-    this.hero.body.checkCollision.up = true;
-    this.hero.body.checkCollision.down = true;
-    this.hero.body.checkCollision.left = true;
-    this.hero.body.checkCollision.right = true;
+    this.hero.body.checkCollision.up = false;
+    this.hero.body.checkCollision.left = false;
+    this.hero.body.checkCollision.right = false;
   },
 
   moveHeroByClick: function() {
@@ -253,7 +201,7 @@ Jumper.Play.prototype = {
     const heroY = this.hero.position.y;
     let lowerPlatformX = Number.MIN_SAFE_INTEGER;
     let lowerPlatformY = Number.MIN_SAFE_INTEGER;
-    this.asteroids.forEachAlive((platform) => {
+    this.platforms.forEachAlive((platform) => {
       console.log('platforms order (y):', platform.position.y, '(x):', platform.position.x);
       // if platform is lower than the player, ignore it
       if ( platform.position.y > heroY ) {
@@ -270,7 +218,7 @@ Jumper.Play.prototype = {
 
     // calculate parabole velocities
     let xVelocity = ( Math.abs(heroX) - Math.abs(lowerPlatformX) ) * 0.7;
-    let yJumpMultiplier = 4.3;
+    let yJumpMultiplier = 4.15;
     if ( this.isFirstJump ) {
       this.isFirstJump = false;
       yJumpMultiplier = 3.6;
@@ -311,7 +259,7 @@ Jumper.Play.prototype = {
     console.log('createNewEnemy',this.game.width - 100, this.cameraYMin - 100);
     if (spawnAllowed) {
       if ( this.game.rnd.integerInRange(1, 2) % 2 == 0 ) {
-        this.spawnFlameAsteroid();
+        this.spawnAsteroid();
       } else {
         this.spawnAlien();
       }
@@ -323,11 +271,11 @@ Jumper.Play.prototype = {
     this.game.time.events.add(time, this.createNewEnemy, this); // add a timer that gets called once, then auto disposes to create a new enemy after the time given
   },
 
-  spawnFlameAsteroid: function() {
+  spawnAsteroid: function() {
 
     let aRandomNumber = this.game.rnd.integerInRange(1000, 1500); // genera un numero a caso tra 1000 e 9000
 
-    let asteroid = this.flameAsteroids.create( this.game.width - 1, this.cameraYMin + 300, 'flame_asteroid');
+    let asteroid = this.asteroidGroup.create( this.game.width - 1, this.cameraYMin + 300, 'flame_asteroid');
     asteroid.scale.x = 0.15;
     asteroid.scale.y = 0.15;
     asteroid.anchor.set( 0.5 );
@@ -349,7 +297,7 @@ Jumper.Play.prototype = {
 
     let aRandomNumber = this.game.rnd.integerInRange(1000, 9000);
 
-    let alien = this.aliens.create( this.game.width - 1, this.cameraYMin + 400, 'aliens');
+    let alien = this.alienGroup.create( this.game.width - 1, this.cameraYMin + 400, 'aliens');
     alien.scale.x = 0.15;
     alien.scale.y = 0.15;
     alien.anchor.set( 0.5 );
@@ -371,12 +319,14 @@ Jumper.Play.prototype = {
     console.log('checkEnemyTouch');
     if ( !this.isDying ){
 
+      /*
       var emitter = game.add.emitter(hero.position.x, hero.position.y, 250);
-      emitter.makeParticles('pixel', [0, 1, 2, 3, 4, 5]);
+      emitter.makeParticles('flame_asteroid', [0, 1, 2, 3, 4, 5]);
       emitter.minParticleSpeed.setTo(-400, -400);
       emitter.maxParticleSpeed.setTo(400, 400);
       emitter.gravity = 0;
       emitter.start(false, 4000, 15);
+       */
 
       this.isDying = true;
       hero.enableBody = false;
@@ -387,35 +337,26 @@ Jumper.Play.prototype = {
       hero.body.checkCollision.left = false;
       hero.body.checkCollision.right = false;
 
-      hero.body.velocity.x = enemy.body.velocity.x;
-      hero.body.velocity.y = enemy.body.velocity.y;
+      hero.body.velocity.x = 400;
 
       setTimeout( this.playerDie, 1000 );
     }
   },
 
   playerDie: function() {
-    this.shutdown();
     this.state.start( 'Play' );
   },
 
   shutdown: function() {
     // reset everything, or the world will be messed up
     this.world.setBounds( 0, 0, this.game.width, this.game.height );
-    this.hero.body.velocity.y = 0;
     this.hero.destroy();
     this.hero = null;
-    this.asteroids.destroy();
-    this.asteroids = null;
+    this.platforms.destroy();
+    this.platforms = null;
     this.rocket.destroy();
     this.rocket = null;
-    this.aliens.destroy();
-    this.aliens = null;
-    this.flameAsteroids.destroy();
-    this.flameAsteroids = null;
     this.isDying = false;
-    platformIndex = 0;
-    unstableAsteroidCollisionId = 0;
   },
 }
 
@@ -426,3 +367,4 @@ var width = document.getElementById("game-container").offsetWidth;
 var game = new Phaser.Game( width, height,Phaser.CANVAS, 'game-container' );
 game.state.add( 'Play', Jumper.Play );
 game.state.start( 'Play' );
+

@@ -1,9 +1,7 @@
 TODO
 
-- sitemare il canvas delle grafiche TUTTE!!!!
-- creare risorsa grafica per frammenti di asteroide
-- Modificare tempistiche random di: asteroidi o alieni ogni tot tempo random che se in collisione con il player lo uccidano
-- Creare QR CODE
+- sitemare il canvas delle grafiche
+- [NICE TO HAVE] Creare sistema che ogni X (random) piattaforme faccia in modo che una di esse si sgretoli dopo un tot di secondi che il personaggi vi risiede
+- [NICE TO HAVE] Sistemare asteroidi o alieni ogni tot tempo random che se in collisione con il player lo uccidano
 
-- Creare sistema che ogni X (random) piattaforme faccia in modo che una di esse si sgretoli dopo un tot di secondi che il personaggi vi risiede
-- Fix unstable asteroids mechs
+- Caricarlo su di un Hosting / Configurare l'hosting / ottenere credenziali FTP
