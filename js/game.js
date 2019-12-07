@@ -15,7 +15,7 @@ Jumper.Play.prototype = {
     this.load.image( 'razzo', 'assets/razzo_nuovo.png');
     this.load.image( 'bg', 'assets/sfondo.jpg');
     this.load.image( 'flame_asteroid', 'assets/asteroide_infuocata.png');
-    this.load.image( 'unstable_asteroid', 'assets/asteroide_rotta.png');
+    this.load.image( 'unstable_asteroid', 'assets/asteroide_nuova.png');
     this.load.image( 'aliens', 'assets/alieni.png');
   },
 
@@ -142,16 +142,17 @@ Jumper.Play.prototype = {
       }
     }
 
-    var platform = this.asteroids.getFirstDead();
+    var platform = this.asteroids.create(x, y, 'asteroide');
 
     if ( generateUnstable ){
       platform.loadTexture('unstable_asteroid');
     }
 
-    platform.reset( x, y );
+    this.game.physics.arcade.enable(platform);
+    platform.enableBody = true;
     platform.anchor.set( 0.5 );
-    platform.scale.x = 0.25; // asteroid its 595 x 595 px, so, 0.25 factor is 148.75 =~ 150
-    platform.scale.y = 0.25;
+    platform.scale.x = 0.23; // asteroid its 595 x 595 px, so, 0.25 factor is 148.75 =~ 150
+    platform.scale.y = 0.23;
     //platform.x -= 75;
     //platform.y -= 75;
     platform.body.immovable = true;
@@ -167,29 +168,89 @@ Jumper.Play.prototype = {
     if ( unstableAsteroid.key !== 'unstable_asteroid' ){
       return;
     }
+
+    console.log(hero.position.x);
+    console.log(hero.position.y);
+    console.log(unstableAsteroid.position.x);
+    console.log(unstableAsteroid.position.y);
+
+    const distanceFromHero = hero.position.distance( unstableAsteroid.position );
+    console.log(distanceFromHero);
+    console.log("---");
+    if ( distanceFromHero > 85 ) {
+      return;
+    }
+
     // this check to execute code only on collision detected first time
     if ( unstableAsteroidCollisionId !== platformIndex ) {
       unstableAsteroidCollisionId = platformIndex;
       var that = this;
+      let time = this.game.rnd.integerInRange(0, 3000); // genera un numero a caso tra 1000 e 9000
       setTimeout( function() {
         that.explodeUnstableAsteroid(unstableAsteroid);
-      } , 5000 );
+      } , 1000 );
     }
   },
 
-  explodeUnstableAsteroid(unstableAsteroid) {
-    var emitter = game.add.emitter(unstableAsteroid.position.x, unstableAsteroid.position.y, 250);
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  },
+
+  async explodeUnstableAsteroid(unstableAsteroid) {
+
+    console.log(unstableAsteroid.position.y, this.cameraYMin, this.game.height,
+        unstableAsteroid.position.x, this.game.width, unstableAsteroid.position.x);
+    let isAway = false;
+    if(
+        unstableAsteroid.position.y > this.cameraYMin + this.game.height ||
+        unstableAsteroid.position.x > this.game.width || unstableAsteroid.position.x < 0
+    ) {
+      isAway = true;
+    }
+
+    if ( !unstableAsteroid.alive || isAway ) {
+      return;
+    }
+
+    unstableAsteroid.angle = 25;
+    unstableAsteroid.position.x += 25;
+    await this.sleep(300);
+    unstableAsteroid.angle = -25;
+    unstableAsteroid.position.x -= 25;
+    await this.sleep(300);
+    unstableAsteroid.angle = 25;
+    unstableAsteroid.position.x += 25;
+    await this.sleep(300);
+    unstableAsteroid.angle = -25;
+    unstableAsteroid.position.x -= 25;
+    await this.sleep(300);
+    unstableAsteroid.angle = 25;
+    unstableAsteroid.position.x += 25;
+    await this.sleep(300);
+    unstableAsteroid.angle = -25;
+    unstableAsteroid.position.x -= 25;
+    await this.sleep(300);
+
+    var emitter = game.add.emitter(unstableAsteroid.position.x, unstableAsteroid.position.y, 60);
     emitter.makeParticles('pixel', [0, 1, 2, 3, 4, 5]);
     emitter.minParticleSpeed.setTo(-400, -400);
     emitter.maxParticleSpeed.setTo(400, 400);
-    emitter.gravity = 20;
+    emitter.gravity = 0;
+    emitter.setScale(20,30,20,30,0,null,true);
     emitter.start(false, 4000, 15);
 
     unstableAsteroid.destroy();
 
     this.hero.enableBody = false;
     this.hero.body.checkCollision.down = false;
-    this.hero.body.velocity.y = 200;
+    this.hero.body.checkCollision.down = false;
+    this.hero.body.checkCollision.down = false;
+    this.hero.body.checkCollision.down = false;
+
+    let yExplosionHero = this.game.rnd.integerInRange(-400, 400);
+    let xExplosionHero = this.game.rnd.integerInRange(-400, 400);
+    this.hero.body.velocity.y = yExplosionHero;
+    this.hero.body.velocity.x = xExplosionHero;
   },
 
   createRocketFloor() {
@@ -310,7 +371,7 @@ Jumper.Play.prototype = {
   createNewEnemy() {
     console.log('createNewEnemy',this.game.width - 100, this.cameraYMin - 100);
     if (spawnAllowed) {
-      if ( this.game.rnd.integerInRange(1, 2) % 2 == 0 ) {
+      if ( this.game.rnd.integerInRange(1, 4) % 2 == 0 ) {
         this.spawnFlameAsteroid();
       } else {
         this.spawnAlien();
