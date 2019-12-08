@@ -346,7 +346,7 @@ Jumper.Play.prototype = {
 
     // calculate parabole velocities
     let xVelocity = ( Math.abs(heroX) - Math.abs(lowerPlatformX) ) * 0.7;
-    let yJumpMultiplier = 4.3;
+    let yJumpMultiplier = 4.15;
     if ( this.isFirstJump ) {
       this.isFirstJump = false;
       yJumpMultiplier = 3.6;
