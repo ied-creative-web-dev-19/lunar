@@ -1,8 +1,4 @@
 TODO
 
-- [Design] Ritagliare le grafiche di:
-    - alieni.png
-    - asteroide_infuocata.png
-- [Design] Creare elemento grafico di pezzo di asteroide che esplode da inserire in animazione particellare
 - [Code] Modificare parametri di velocità e posizione delle apparizioni dei nemici
 - [Code] Modificare parametri di inizio fase asteroidi instabili e frequenza

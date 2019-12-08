@@ -2,9 +2,14 @@ var Jumper = function() {};
 Jumper.Play = function() {};
 
 let platformIndex = 0;
-const UNSTABLE_ASTEROIDS_SPAWN_THRESHOLD = 1;
-let spawnAllowed = true;
 let unstableAsteroidCollisionId = 0;
+let spawnAllowed = true;
+
+// EDITHERE this handles the minimum time before enemy starts appearing in ms
+const ENEMY_SPAWN_TIME_THRESHOLD = 3000;
+
+// EDITHERE this handles the minimum jumps made before platform asteroid may become unstable
+const UNSTABLE_ASTEROIDS_JUMP_THRESHOLD = 1;
 
 Jumper.Play.prototype = {
 
@@ -57,7 +62,7 @@ Jumper.Play.prototype = {
     // create enemies
     this.flameAsteroids = this.game.add.group(); // create group
     this.aliens = this.game.add.group(); // create group
-    this.game.time.events.add( 3000 , this.createNewEnemy, this);
+    this.game.time.events.add( ENEMY_SPAWN_TIME_THRESHOLD , this.createNewEnemy, this);
 
     this.game.input.onTap.add(this.moveHeroByClick, this);
   },
@@ -139,11 +144,14 @@ Jumper.Play.prototype = {
 
     // check if it's needed to generate an unstable asteroid with minumum limit and randomly
     let generateUnstable = false;
-    if ( UNSTABLE_ASTEROIDS_SPAWN_THRESHOLD <= platformIndex ) {
-      let aRandomNumber = this.game.rnd.integerInRange(1, 2);
-      if ( aRandomNumber % 2 === 0 ) {
+    if ( UNSTABLE_ASTEROIDS_JUMP_THRESHOLD <= platformIndex ) {
+
+      // EDITHERE the number below is the time in ms before the asteroids starts being unstable after the player's on it
+      let chanchesToGetUnstablePlatform = this.game.rnd.integerInRange(1, 2);
+      if ( chanchesToGetUnstablePlatform % 2 === 0 ) {
         generateUnstable = true;
       }
+
     }
 
     var platform = this.asteroids.create(x, y, 'asteroide');
@@ -190,11 +198,13 @@ Jumper.Play.prototype = {
     if ( unstableAsteroidCollisionId !== platformIndex ) {
       unstableAsteroidCollisionId = platformIndex;
       var that = this;
-      let time = this.game.rnd.integerInRange(0, 3000); // genera un numero a caso tra 1000 e 9000
-      console.log('xxx');
+
+      // EDITHERE the number below is the time in ms before the asteroids starts being unstable after the player's on it
+      let timeToUnstability = this.game.rnd.integerInRange(250, 750);
+
       setTimeout( function() {
         that.explodeUnstableAsteroid(unstableAsteroid, hero);
-      } , 500 );
+      } , timeToUnstability );
     }
   },
 
@@ -219,6 +229,8 @@ Jumper.Play.prototype = {
       return;
     }
 
+
+    // EDITHERE code below handles the unstability before explosion
     unstableAsteroid.angle = 25;
     unstableAsteroid.position.x += 25;
     await this.sleep(300);
@@ -237,6 +249,7 @@ Jumper.Play.prototype = {
     unstableAsteroid.angle = -25;
     unstableAsteroid.position.x -= 25;
     await this.sleep(300);
+    // ---
 
     var emitter = game.add.emitter(unstableAsteroid.position.x, unstableAsteroid.position.y, 60);
     emitter.makeParticles('frammenti', [0, 1, 2, 3]);
@@ -386,25 +399,44 @@ Jumper.Play.prototype = {
   createNewEnemy() {
     console.log('createNewEnemy',this.game.width - 90, this.cameraYMin - 90);
     if (spawnAllowed) {
+      // EDITHERE this handles on how much does an asteroid occurs than an ufo
       if ( this.game.rnd.integerInRange(1, 4) % 2 == 0 ) {
         this.spawnFlameAsteroid();
       } else {
         this.spawnAlien();
       }
-      this.queueEnemy( this.game.rnd.integerInRange(2500, 4700) ); // call enemy queue for random between 2.5 and 5 seconds
+      // EDITHERE spawn _the next enemy_ on a time by a random value between the two numbers
+      this.queueEnemy( this.game.rnd.integerInRange(2500, 4700) );
     }
   },
 
   queueEnemy(time) {
-    this.game.time.events.add(100000, this.createNewEnemy, this); // add a timer that gets called once, then auto disposes to create a new enemy after the time given
+    this.game.time.events.add(time, this.createNewEnemy, this);
 
   },
 
   spawnFlameAsteroid: function() {
 
-    let aRandomNumber = this.game.rnd.integerInRange(1000, 1500); // genera un numero a caso tra 1000 e 9000
+    // EDITHERE this make the enemy appears on the left or on the right
+    let startPositionX;
+    let velocityX;
+    let velocityY;
+    if ( this.game.rnd.integerInRange(1, 2) % 2 == 0 ) {
+      // start position on the right
+      startPositionX = this.game.width - 1;
+      velocityX = this.game.rnd.integerInRange(-10, -200);
+      velocityY = this.game.rnd.integerInRange(-50, 50);
+    } else {
+      // start position on the left
+      startPositionX = 1;
+      velocityX = this.game.rnd.integerInRange(10, 200);
+      velocityY = this.game.rnd.integerInRange(-50, 50);
+    }
 
-    let asteroid = this.flameAsteroids.create( this.game.width - 1, this.cameraYMin + 300, 'flame_asteroid');
+    // EDITHERE start position on vertical for the enemy random between the tow numbers
+    let startPositionY = this.game.rnd.integerInRange( this.cameraYMin + 10 , this.cameraYMin + this.game.width - 10 );
+
+    let asteroid = this.flameAsteroids.create(startPositionX , startPositionY, 'flame_asteroid');
     asteroid.scale.x = 0.03;
     asteroid.scale.y = 0.03;
     asteroid.anchor.set( 0.5 );
@@ -418,15 +450,32 @@ Jumper.Play.prototype = {
     asteroid.body.checkCollision.left = true;
     asteroid.body.checkCollision.right = true;
 
-    asteroid.body.velocity.x = -100;
-    asteroid.body.velocity.y = 30;
+    asteroid.body.velocity.x = velocityX;
+    asteroid.body.velocity.y = velocityY;
   },
 
   spawnAlien: function() {
 
-    let aRandomNumber = this.game.rnd.integerInRange(1000, 9000);
+    // EDITHERE this make the enemy appears on the left or on the right
+    let startPositionX;
+    let velocityX;
+    let velocityY;
+    if ( this.game.rnd.integerInRange(1, 2) % 2 == 0 ) {
+      // start position on the right
+      startPositionX = this.game.width - 1;
+      velocityX = this.game.rnd.integerInRange(-10, -200);
+      velocityY = this.game.rnd.integerInRange(-50, 50);
+    } else {
+      // start position on the left
+      startPositionX = 1;
+      velocityX = this.game.rnd.integerInRange(10, 200);
+      velocityY = this.game.rnd.integerInRange(-50, 50);
+    }
 
-    let alien = this.aliens.create( this.game.width - 1, this.cameraYMin + 400, 'aliens');
+    // EDITHERE start position on vertical for the enemy random between the tow numbers
+    let startPositionY = this.game.rnd.integerInRange( this.cameraYMin + 10 , this.cameraYMin + this.game.width - 10 );
+
+    let alien = this.aliens.create( startPositionX , startPositionY, 'aliens');
     alien.scale.x = 0.03;
     alien.scale.y = 0.03;
     alien.anchor.set( 0.5 );
@@ -440,8 +489,8 @@ Jumper.Play.prototype = {
     alien.body.checkCollision.left = true;
     alien.body.checkCollision.right = true;
 
-    alien.body.velocity.x = -80;
-    alien.body.velocity.y = 40;
+    alien.body.velocity.x = velocityX;
+    alien.body.velocity.y = velocityY;
   },
 
   checkEnemyTouch: function(hero, enemy){
