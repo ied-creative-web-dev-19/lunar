@@ -118,7 +118,6 @@ Jumper.Play.prototype = {
     // platform basic setup
     this.asteroids = this.add.group();
     this.asteroids.enableBody = true;
-    this.asteroids.createMultiple( 10, 'asteroide');
 
     let howManyPlatform = Math.floor(this.world.height / 200) + 1;
 
