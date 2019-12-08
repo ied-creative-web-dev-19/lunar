@@ -22,7 +22,12 @@ Jumper.Play.prototype = {
   create: function() {
     // background color
     this.stage.backgroundColor = '#000';
-    this.bg = this.game.add.tileSprite(0, 0, 750, 1334, 'bg');
+
+    const bgWidth = this.game.width;
+    const bgHeight = 1334 / 750 * this.game.width;
+    this.bg = this.game.add.tileSprite(0, 0, bgWidth, bgHeight, 'bg');
+    const bgScale = this.game.width / 750;
+    this.bg.tileScale.set(bgScale, bgScale);
 
     // scaling
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
