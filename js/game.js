@@ -17,6 +17,7 @@ Jumper.Play.prototype = {
     this.load.image( 'flame_asteroid', 'assets/asteroide_infuocata_nuovo.png');
     this.load.image( 'unstable_asteroid', 'assets/asteroide_nuova.png');
     this.load.image( 'aliens', 'assets/alieni_nuovo.png');
+    this.load.image( 'frammenti', 'assets/pezzi_asteroide.png');
   },
 
   create: function() {
@@ -239,7 +240,7 @@ Jumper.Play.prototype = {
     await this.sleep(300);
 
     var emitter = game.add.emitter(unstableAsteroid.position.x, unstableAsteroid.position.y, 60);
-    emitter.makeParticles('pixel', [0, 1, 2, 3, 4, 5]);
+    emitter.makeParticles('frammenti', [0, 1, 2, 3, 4, 5]);
     emitter.minParticleSpeed.setTo(-400, -400);
     emitter.maxParticleSpeed.setTo(400, 400);
     emitter.gravity = 0;
@@ -248,7 +249,7 @@ Jumper.Play.prototype = {
 
     setTimeout ( function () {
       emitter.on = false;
-    }, 2000 );
+    },  );
 
     unstableAsteroid.destroy();
 
@@ -384,7 +385,7 @@ Jumper.Play.prototype = {
   },
 
   createNewEnemy() {
-    console.log('createNewEnemy',this.game.width - 100, this.cameraYMin - 100);
+    console.log('createNewEnemy',this.game.width - 90, this.cameraYMin - 90);
     if (spawnAllowed) {
       if ( this.game.rnd.integerInRange(1, 4) % 2 == 0 ) {
         this.spawnFlameAsteroid();
@@ -396,7 +397,8 @@ Jumper.Play.prototype = {
   },
 
   queueEnemy(time) {
-    this.game.time.events.add(time, this.createNewEnemy, this); // add a timer that gets called once, then auto disposes to create a new enemy after the time given
+    this.game.time.events.add(100000, this.createNewEnemy, this); // add a timer that gets called once, then auto disposes to create a new enemy after the time given
+
   },
 
   spawnFlameAsteroid: function() {
@@ -449,7 +451,7 @@ Jumper.Play.prototype = {
 
       var emitter = game.add.emitter(hero.position.x, hero.position.y, 250);
       emitter.makeParticles('pixel', [0, 1, 2, 3, 4, 5]);
-      emitter.minParticleSpeed.setTo(-400, -400);
+      emitter.minParticleSpeed.setTo(-700, -700);
       emitter.maxParticleSpeed.setTo(400, 400);
       emitter.gravity = 0;
       emitter.start(false, 4000, 15);
