@@ -240,16 +240,16 @@ Jumper.Play.prototype = {
     await this.sleep(300);
 
     var emitter = game.add.emitter(unstableAsteroid.position.x, unstableAsteroid.position.y, 60);
-    emitter.makeParticles('frammenti', [0, 1, 2, 3, 4, 5]);
+    emitter.makeParticles('frammenti', [0, 1, 2, 3]);
     emitter.minParticleSpeed.setTo(-400, -400);
-    emitter.maxParticleSpeed.setTo(400, 400);
+    emitter.maxParticleSpeed.setTo(500, 500);
     emitter.gravity = 0;
-    emitter.setScale(20,30,20,30,0,null,true);
+    emitter.setScale(0.05,0.1,0.05,0.1,0,null,true);
     emitter.start(false, 4000, 15);
 
     setTimeout ( function () {
       emitter.on = false;
-    },  );
+    }, 1000 );
 
     unstableAsteroid.destroy();
 
