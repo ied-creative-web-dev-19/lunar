@@ -2,7 +2,7 @@ var Jumper = function() {};
 Jumper.Play = function() {};
 
 let platformIndex = 0;
-const UNSTABLE_ASTEROIDS_SPAWN_THRESHOLD = 10;
+const UNSTABLE_ASTEROIDS_SPAWN_THRESHOLD = 1;
 let spawnAllowed = true;
 let unstableAsteroidCollisionId = 0;
 
@@ -22,7 +22,12 @@ Jumper.Play.prototype = {
   create: function() {
     // background color
     this.stage.backgroundColor = '#000';
-    this.bg = this.game.add.tileSprite(0, 0, 750, 1334, 'bg');
+
+    const bgWidth = this.game.width;
+    const bgHeight = 1334 / 750 * this.game.width;
+    this.bg = this.game.add.tileSprite(0, 0, bgWidth, bgHeight, 'bg');
+    const bgScale = this.game.width / 750;
+    this.bg.tileScale.set(bgScale, bgScale);
 
     // scaling
     this.scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
@@ -52,7 +57,6 @@ Jumper.Play.prototype = {
     this.flameAsteroids = this.game.add.group(); // create group
     this.aliens = this.game.add.group(); // create group
     this.game.time.events.add( 3000 , this.createNewEnemy, this);
-
 
     this.game.input.onTap.add(this.moveHeroByClick, this);
   },
@@ -164,20 +168,21 @@ Jumper.Play.prototype = {
     return platform;
   },
 
+  isColliding( elem1, elem2) {
+    const distance = elem1.position.distance( elem2.position );
+    const margin = 85;
+    if ( distance < margin ) {
+      return true;
+    }
+    return false;
+  },
+
   checkUnstableAsteroidCollide(hero, unstableAsteroid) {
     if ( unstableAsteroid.key !== 'unstable_asteroid' ){
       return;
     }
 
-    console.log(hero.position.x);
-    console.log(hero.position.y);
-    console.log(unstableAsteroid.position.x);
-    console.log(unstableAsteroid.position.y);
-
-    const distanceFromHero = hero.position.distance( unstableAsteroid.position );
-    console.log(distanceFromHero);
-    console.log("---");
-    if ( distanceFromHero > 85 ) {
+    if ( !this.isColliding(hero, unstableAsteroid) ) {
       return;
     }
 
@@ -186,9 +191,10 @@ Jumper.Play.prototype = {
       unstableAsteroidCollisionId = platformIndex;
       var that = this;
       let time = this.game.rnd.integerInRange(0, 3000); // genera un numero a caso tra 1000 e 9000
+      console.log('xxx');
       setTimeout( function() {
-        that.explodeUnstableAsteroid(unstableAsteroid);
-      } , 1000 );
+        that.explodeUnstableAsteroid(unstableAsteroid, hero);
+      } , 500 );
     }
   },
 
@@ -196,13 +202,14 @@ Jumper.Play.prototype = {
     return new Promise(resolve => setTimeout(resolve, ms));
   },
 
-  async explodeUnstableAsteroid(unstableAsteroid) {
+  async explodeUnstableAsteroid(unstableAsteroid, hero) {
 
     console.log(unstableAsteroid.position.y, this.cameraYMin, this.game.height,
         unstableAsteroid.position.x, this.game.width, unstableAsteroid.position.x);
+
     let isAway = false;
     if(
-        unstableAsteroid.position.y > this.cameraYMin + this.game.height ||
+        unstableAsteroid.position.y - 30 > this.cameraYMin + this.game.height ||
         unstableAsteroid.position.x > this.game.width || unstableAsteroid.position.x < 0
     ) {
       isAway = true;
@@ -239,7 +246,15 @@ Jumper.Play.prototype = {
     emitter.setScale(20,30,20,30,0,null,true);
     emitter.start(false, 4000, 15);
 
+    setTimeout ( function () {
+      emitter.on = false;
+    }, 2000 );
+
     unstableAsteroid.destroy();
+
+    if ( !this.isColliding(hero, unstableAsteroid) ){
+      return;
+    }
 
     this.hero.enableBody = false;
     this.hero.body.checkCollision.down = false;
@@ -331,7 +346,7 @@ Jumper.Play.prototype = {
 
     // calculate parabole velocities
     let xVelocity = ( Math.abs(heroX) - Math.abs(lowerPlatformX) ) * 0.7;
-    let yJumpMultiplier = 4.15;
+    let yJumpMultiplier = 4.3;
     if ( this.isFirstJump ) {
       this.isFirstJump = false;
       yJumpMultiplier = 3.6;
@@ -410,7 +425,7 @@ Jumper.Play.prototype = {
 
     let aRandomNumber = this.game.rnd.integerInRange(1000, 9000);
 
-    let alien = this.aliens.create( this.game.width - 2, this.cameraYMin + 400, 'aliens');
+    let alien = this.aliens.create( this.game.width - 1, this.cameraYMin + 400, 'aliens');
     alien.scale.x = 0.03;
     alien.scale.y = 0.03;
     alien.anchor.set( 0.5 );

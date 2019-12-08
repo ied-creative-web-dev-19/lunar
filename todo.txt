@@ -1,7 +1,8 @@
 TODO
 
-- sitemare il canvas delle grafiche
-- [NICE TO HAVE] Creare sistema che ogni X (random) piattaforme faccia in modo che una di esse si sgretoli dopo un tot di secondi che il personaggi vi risiede
-- [NICE TO HAVE] Sistemare asteroidi o alieni ogni tot tempo random che se in collisione con il player lo uccidano
-
-- Caricarlo su di un Hosting / Configurare l'hosting / ottenere credenziali FTP
+- [Design] Ritagliare le grafiche di:
+    - alieni.png
+    - asteroide_infuocata.png
+- [Design] Creare elemento grafico di pezzo di asteroide che esplode da inserire in animazione particellare
+- [Code] Modificare parametri di velocità e posizione delle apparizioni dei nemici
+- [Code] Modificare parametri di inizio fase asteroidi instabili e frequenza
