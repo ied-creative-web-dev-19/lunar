@@ -428,12 +428,12 @@ Jumper.Play.prototype = {
       // start position on the right
       startPositionX = this.game.width - 1;
       velocityX = this.game.rnd.integerInRange(-30, -150);
-      velocityY = this.game.rnd.integerInRange(-50, 50);
+      velocityY = this.game.rnd.integerInRange(-50, 30);
     } else {
       // start position on the left
       startPositionX = 1;
       velocityX = this.game.rnd.integerInRange(30, 150);
-      velocityY = this.game.rnd.integerInRange(-50, 50);
+      velocityY = this.game.rnd.integerInRange(-50, 80);
       horizontalSimmetry = -1;
     }
 
