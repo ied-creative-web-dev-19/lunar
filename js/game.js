@@ -427,13 +427,13 @@ Jumper.Play.prototype = {
     if ( this.game.rnd.integerInRange(1, 2) % 2 == 0 ) {
       // start position on the right
       startPositionX = this.game.width - 1;
-      velocityX = this.game.rnd.integerInRange(-10, -200);
-      velocityY = this.game.rnd.integerInRange(-80, 80);
+      velocityX = this.game.rnd.integerInRange(-30, -150);
+      velocityY = this.game.rnd.integerInRange(-50, 50);
     } else {
       // start position on the left
       startPositionX = 1;
-      velocityX = this.game.rnd.integerInRange(10, 200);
-      velocityY = this.game.rnd.integerInRange(-80, 80);
+      velocityX = this.game.rnd.integerInRange(30, 150);
+      velocityY = this.game.rnd.integerInRange(-50, 50);
       horizontalSimmetry = -1;
     }
 
@@ -467,13 +467,13 @@ Jumper.Play.prototype = {
     if ( this.game.rnd.integerInRange(1, 2) % 2 == 0 ) {
       // start position on the right
       startPositionX = this.game.width - 1;
-      velocityX = this.game.rnd.integerInRange(-10, -200);
-      velocityY = this.game.rnd.integerInRange(-80, 80);
+      velocityX = this.game.rnd.integerInRange(-30, -150);
+      velocityY = this.game.rnd.integerInRange(-50, 50);
     } else {
       // start position on the left
       startPositionX = 1;
-      velocityX = this.game.rnd.integerInRange(10, 200);
-      velocityY = this.game.rnd.integerInRange(-80, 80);
+      velocityX = this.game.rnd.integerInRange(30, 150);
+      velocityY = this.game.rnd.integerInRange(-50, 50);
     }
 
     // EDITHERE start position on vertical for the enemy random between the tow numbers
