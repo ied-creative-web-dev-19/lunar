@@ -6,10 +6,10 @@ let unstableAsteroidCollisionId = 0;
 let spawnAllowed = true;
 
 // EDITHERE this handles the minimum time before enemy starts appearing in ms
-const ENEMY_SPAWN_TIME_THRESHOLD = 3000;
+const ENEMY_SPAWN_TIME_THRESHOLD = 8000;
 
 // EDITHERE this handles the minimum jumps made before platform asteroid may become unstable
-const UNSTABLE_ASTEROIDS_JUMP_THRESHOLD = 1;
+const UNSTABLE_ASTEROIDS_JUMP_THRESHOLD = 5;
 
 Jumper.Play.prototype = {
 
@@ -22,7 +22,8 @@ Jumper.Play.prototype = {
     this.load.image( 'flame_asteroid', 'assets/asteroide_infuocata_nuovo.png');
     this.load.image( 'unstable_asteroid', 'assets/asteroide_nuova.png');
     this.load.image( 'aliens', 'assets/alieni_nuovo.png');
-    this.load.image( 'frammenti', 'assets/pezzi_asteroide.png');
+    this.load.image( 'frammenti', 'assets/asteroide_frammento.png');
+    this.load.image( 'flame_asteroid_2', 'assets/asteroide_infuocata_nuovo2.png');
   },
 
   create: function() {
@@ -200,7 +201,7 @@ Jumper.Play.prototype = {
       var that = this;
 
       // EDITHERE the number below is the time in ms before the asteroids starts being unstable after the player's on it
-      let timeToUnstability = this.game.rnd.integerInRange(250, 750);
+      let timeToUnstability = this.game.rnd.integerInRange(100, 250);
 
       setTimeout( function() {
         that.explodeUnstableAsteroid(unstableAsteroid, hero);
@@ -256,7 +257,7 @@ Jumper.Play.prototype = {
     emitter.minParticleSpeed.setTo(-400, -400);
     emitter.maxParticleSpeed.setTo(500, 500);
     emitter.gravity = 0;
-    emitter.setScale(0.05,0.1,0.05,0.1,0,null,true);
+    emitter.setScale(0.05,0.1,0.05, 0.1,0,null,true);
     emitter.start(false, 4000, 15);
 
     setTimeout ( function () {
@@ -406,7 +407,7 @@ Jumper.Play.prototype = {
         this.spawnAlien();
       }
       // EDITHERE spawn _the next enemy_ on a time by a random value between the two numbers
-      this.queueEnemy( this.game.rnd.integerInRange(2500, 4700) );
+      this.queueEnemy( this.game.rnd.integerInRange(3000, 5000) );
     }
   },
 
@@ -421,20 +422,21 @@ Jumper.Play.prototype = {
     let startPositionX;
     let velocityX;
     let velocityY;
+
     if ( this.game.rnd.integerInRange(1, 2) % 2 == 0 ) {
       // start position on the right
       startPositionX = this.game.width - 1;
       velocityX = this.game.rnd.integerInRange(-10, -200);
-      velocityY = this.game.rnd.integerInRange(-50, 50);
+      velocityY = this.game.rnd.integerInRange(-80, 80);
     } else {
       // start position on the left
       startPositionX = 1;
       velocityX = this.game.rnd.integerInRange(10, 200);
-      velocityY = this.game.rnd.integerInRange(-50, 50);
+      velocityY = this.game.rnd.integerInRange(-80, 80);
     }
 
     // EDITHERE start position on vertical for the enemy random between the tow numbers
-    let startPositionY = this.game.rnd.integerInRange( this.cameraYMin + 10 , this.cameraYMin + this.game.width - 10 );
+    let startPositionY = this.game.rnd.integerInRange( this.cameraYMin + 8 , this.cameraYMin + this.game.width - 8 );
 
     let asteroid = this.flameAsteroids.create(startPositionX , startPositionY, 'flame_asteroid');
     asteroid.scale.x = 0.03;
@@ -464,16 +466,16 @@ Jumper.Play.prototype = {
       // start position on the right
       startPositionX = this.game.width - 1;
       velocityX = this.game.rnd.integerInRange(-10, -200);
-      velocityY = this.game.rnd.integerInRange(-50, 50);
+      velocityY = this.game.rnd.integerInRange(-80, 80);
     } else {
       // start position on the left
       startPositionX = 1;
       velocityX = this.game.rnd.integerInRange(10, 200);
-      velocityY = this.game.rnd.integerInRange(-50, 50);
+      velocityY = this.game.rnd.integerInRange(-80, 80);
     }
 
     // EDITHERE start position on vertical for the enemy random between the tow numbers
-    let startPositionY = this.game.rnd.integerInRange( this.cameraYMin + 10 , this.cameraYMin + this.game.width - 10 );
+    let startPositionY = this.game.rnd.integerInRange( this.cameraYMin + 8 , this.cameraYMin + this.game.width - 8 );
 
     let alien = this.aliens.create( startPositionX , startPositionY, 'aliens');
     alien.scale.x = 0.03;
