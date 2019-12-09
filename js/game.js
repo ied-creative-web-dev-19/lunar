@@ -475,7 +475,7 @@ Jumper.Play.prototype = {
     }
 
     // EDITHERE start position on vertical for the enemy random between the tow numbers
-    let startPositionY = this.game.rnd.integerInRange( this.cameraYMin + 8 , this.cameraYMin + this.game.width - 8 );
+    let startPositionY = this.game.rnd.integerInRange( this.cameraYMin + 8 , this.cameraYMin + this.game.width - 8);
 
     let alien = this.aliens.create( startPositionX , startPositionY, 'aliens');
     alien.scale.x = 0.03;
