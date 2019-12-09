@@ -422,6 +422,7 @@ Jumper.Play.prototype = {
     let startPositionX;
     let velocityX;
     let velocityY;
+    let horizontalSimmetry = 1;
 
     if ( this.game.rnd.integerInRange(1, 2) % 2 == 0 ) {
       // start position on the right
@@ -433,13 +434,14 @@ Jumper.Play.prototype = {
       startPositionX = 1;
       velocityX = this.game.rnd.integerInRange(10, 200);
       velocityY = this.game.rnd.integerInRange(-80, 80);
+      horizontalSimmetry = -1;
     }
 
     // EDITHERE start position on vertical for the enemy random between the tow numbers
     let startPositionY = this.game.rnd.integerInRange( this.cameraYMin + 8 , this.cameraYMin + this.game.width - 8 );
 
     let asteroid = this.flameAsteroids.create(startPositionX , startPositionY, 'flame_asteroid');
-    asteroid.scale.x = 0.03;
+    asteroid.scale.x = 0.03 * horizontalSimmetry;
     asteroid.scale.y = 0.03;
     asteroid.anchor.set( 0.5 );
 
