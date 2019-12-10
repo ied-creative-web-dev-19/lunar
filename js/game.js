@@ -66,7 +66,7 @@ Jumper.Play.prototype = {
     this.game.time.events.add( ENEMY_SPAWN_TIME_THRESHOLD , this.createNewEnemy, this);
 
     this.game.input.onTap.add(this.moveHeroByClick, this);
-  },
+
 
   update: function() {
 
