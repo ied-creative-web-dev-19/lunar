@@ -68,6 +68,10 @@ Jumper.Play.prototype = {
     this.game.input.onTap.add(this.moveHeroByClick, this);
 
 
+  render: function() {
+    this.game.debug.text('Punteggio: ' + ( platformIndex - 4 ), 32, 32);
+  },
+
   update: function() {
 
     // this is where the main magic happens
