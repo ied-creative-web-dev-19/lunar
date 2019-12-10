@@ -148,8 +148,8 @@ Jumper.Play.prototype = {
     if ( UNSTABLE_ASTEROIDS_JUMP_THRESHOLD <= platformIndex ) {
 
       // EDITHERE the number below is the time in ms before the asteroids starts being unstable after the player's on it
-      let chanchesToGetUnstablePlatform = this.game.rnd.integerInRange(1, 2);
-      if ( chanchesToGetUnstablePlatform % 2 === 0 ) {
+      let chanchesToGetUnstablePlatform = this.game.rnd.integerInRange(1, 4);
+      if ( chanchesToGetUnstablePlatform % 4 === 0 ) {
         generateUnstable = true;
       }
 
